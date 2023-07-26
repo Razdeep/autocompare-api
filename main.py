@@ -1,10 +1,13 @@
 from fastapi import FastAPI
 import requests
+import logging
 
 from model.AutocompleteTerm import AutocompleteTerm
 from model.GenericResponse import GenericResponse
 
 app = FastAPI()
+
+logger = logging.getLogger()
 
 @app.get("/")
 async def root():
@@ -41,9 +44,8 @@ async def amazon(searchTerm: str = '', maxTerms: int = 8):
     default_paramters = 'limit=11&suggestion-type=WIDGET&suggestion-type=KEYWORD&page-type=Gateway&alias=aps&site-variant=desktop&version=3&event=onkeypress&wc=&lop=en_IN&last-prefix=re&avg-ks-time=29966&fb=1&session-id=257-9914362-9137250&request-id=HW69TAMQWTEFNHE269NZ&mid=A21TJRUUN4KGV&plain-mid=44571&client-info=amazon-search-ui'
     parameters = f'{default_paramters}&prefix={searchTerm}'
     full_url = f'{base_url}/{path}?{parameters}'
-    print(full_url)
     response = requests.get(full_url, timeout=5)
-    print(response.status_code)
+    logger.debug(f'response.status_code: {response.status_code}')
     response_dict = response.json()
     generic_response = convertAmazonResponseToGeneric(response_dict)
     return generic_response
